@@ -3,26 +3,19 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.core.config import settings
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    애플리케이션 시작 시 실행되는 영역
-    - DB 초기화
-    - JSON Import
-    - 모델 생성
-    """
-    print("🚀 LocalHub API Started")
-
+    print(f"🚀 {settings.APP_NAME} Started")
     yield
-
-    print("🛑 LocalHub API Shutdown")
+    print("🛑 Server Shutdown")
 
 
 app = FastAPI(
-    title="LocalHub API",
-    description="AI 기반 지역 관광 커뮤니티 API",
-    version="1.0.0",
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
     lifespan=lifespan,
 )
 
@@ -30,7 +23,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Vue 개발 서버
+        settings.FRONTEND_URL,
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -41,13 +34,15 @@ app.add_middleware(
 @app.get("/", tags=["Root"])
 async def root():
     return {
-        "message": "Welcome to LocalHub API",
-        "status": "running",
+        "message": f"Welcome to {settings.APP_NAME}",
+        "version": settings.APP_VERSION,
     }
 
 
 @app.get("/health", tags=["Health"])
-async def health_check():
+async def health():
     return {
         "status": "healthy",
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
     }
