@@ -15,10 +15,10 @@ aiofiles==24.1.0
 httpx==0.28.1
 
 
-pip install fastapi
-pip install uvicorn
-pip install sqlalchemy
-pip install python-dotenv
-pip install pydantic-settings
-pip install openai
-pip install aiofiles
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-dotenv
+pydantic-settings
+openai
+aiofiles
