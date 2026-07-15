@@ -1,4 +1,13 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class PostCommentPreview(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    content: str | None = None
+    author_name: str | None = None
+    created_at: str | None = None
 
 
 class PostBase(BaseModel):
@@ -25,6 +34,7 @@ class PostRead(BaseModel):
     views: int = 0
     likes: int = 0
     comments: int = 0
+    comment_preview: list[PostCommentPreview] = Field(default_factory=list)
     date: str | None = None
 
 
