@@ -18,7 +18,7 @@ def get_post_service(db: Session = Depends(get_db)) -> PostService:
 @router.get("", response_model=PaginatedResponse[PostRead], summary="게시글 목록 조회")
 async def list_posts(
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=10000),
+    limit: int = Query(default=20, ge=1, le=100),
     service: PostService = Depends(get_post_service),
 ):
     items, total = service.list_posts(skip=skip, limit=limit)

@@ -18,7 +18,7 @@ def get_place_service(db: Session = Depends(get_db)) -> PlaceService:
 @router.get("", response_model=PaginatedResponse[PlaceRead], summary="장소 목록 조회")
 async def list_places(
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=10000),
+    limit: int = Query(default=20, ge=1, le=100),
     keyword: str | None = Query(default=None, description="이름 또는 주소 검색어"),
     content_type_id: str | None = Query(default=None, description="카테고리 ID 필터링"), # 👈 파라미터 추가
     service: PlaceService = Depends(get_place_service),

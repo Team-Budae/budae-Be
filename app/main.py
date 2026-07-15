@@ -10,6 +10,7 @@ from app.domains.category.router import router as category_router
 from app.domains.chat.router import router as chat_router
 from app.domains.comment.router import router as comment_router
 from app.domains.data_source.router import router as data_source_router
+from app.domains.dashboard.router import router as dashboard_router
 from app.domains.place.router import router as place_router
 from app.domains.post.router import router as post_router
 
@@ -48,6 +49,7 @@ app.include_router(comment_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 app.include_router(category_router, prefix="/api")
 app.include_router(data_source_router, prefix="/api")
+app.include_router(dashboard_router, prefix="/api")
 
 
 @app.get("/", tags=["Root"])

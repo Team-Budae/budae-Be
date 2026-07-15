@@ -18,7 +18,7 @@ def get_data_source_service(db: Session = Depends(get_db)) -> DataSourceService:
 @router.get("", response_model=PaginatedResponse[DataSourceRead], summary="데이터 소스 목록 조회")
 async def list_data_sources(
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=10000),
+    limit: int = Query(default=20, ge=1, le=100),
     service: DataSourceService = Depends(get_data_source_service),
 ):
     items = service.list_data_sources(skip=skip, limit=limit)
