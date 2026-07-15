@@ -19,13 +19,22 @@ def get_post_service(db: Session = Depends(get_db)) -> PostService:
 async def list_posts(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
+    sort: str = Query(default="latest", pattern="^(latest|popular)$"),
     service: PostService = Depends(get_post_service),
 ):
-    items, total = service.list_posts(skip=skip, limit=limit)
+    items, total = service.list_posts(skip=skip, limit=limit, sort=sort)
     return {
         "items": [PostRead.model_validate(item) for item in items],
         "pagination": {"page": (skip // limit) + 1 if limit else 1, "size": limit, "total": total},
     }
+
+
+@router.get("/popular", response_model=list[PostRead], summary="인기 게시글 목록 조회")
+async def list_popular_posts(
+    limit: int = Query(default=5, ge=1, le=20),
+    service: PostService = Depends(get_post_service),
+):
+    return [PostRead.model_validate(item) for item in service.list_popular_posts(limit=limit)]
 
 
 @router.get("/{post_id}", response_model=PostRead, summary="게시글 상세 조회")
