@@ -36,8 +36,9 @@ class ChatService:
         messages = self._build_openai_messages(user_messages, retrieval_context, payload.message)
 
         answer_text = self._call_openai(messages)
+
         if not answer_text:
-            answer_text = "죄송합니다. 현재 답변을 생성할 수 없습니다. 다시 시도해주세요."
+            raise RuntimeError("OpenAI 응답이 비어 있습니다.")
 
         response = ChatResponse(
             session_id=session_id,
@@ -130,11 +131,27 @@ class ChatService:
 
     def _call_openai(self, messages: list[dict]) -> str:
         try:
+            print("===== OpenAI Request =====")
+            print(messages)
+
             response = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=messages,
                 max_completion_tokens=800,
             )
-            return response.choices[0].message.content.strip()
-        except OpenAIError as exc:
-            return f"OpenAI 요청 중 오류가 발생했습니다: {str(exc)}"
+
+            print("===== OpenAI Response =====")
+            print(response)
+
+            content = response.choices[0].message.content
+
+            if not content:
+                print("OpenAI returned empty content")
+                return ""
+
+            return content.strip()
+
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return ""
