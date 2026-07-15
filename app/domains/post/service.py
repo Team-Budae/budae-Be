@@ -8,8 +8,11 @@ class PostService:
     def __init__(self, repository: PostRepository):
         self.repository = repository
 
-    def list_posts(self, *, skip: int = 0, limit: int = 20) -> tuple[list[Post], int]:
-        return self.repository.list_posts(skip=skip, limit=limit)
+    def list_posts(self, *, skip: int = 0, limit: int = 20, sort: str = "latest") -> tuple[list[Post], int]:
+        return self.repository.list_posts(skip=skip, limit=limit, sort=sort)
+
+    def list_popular_posts(self, *, limit: int = 5) -> list[Post]:
+        return self.repository.list_popular_posts(limit=limit)
 
     def get_post(self, post_id: int) -> Post:
         post = self.repository.get_by_id(post_id)
