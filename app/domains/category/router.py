@@ -18,7 +18,7 @@ def get_category_service(db: Session = Depends(get_db)) -> CategoryService:
 @router.get("", response_model=PaginatedResponse[CategoryRead], summary="카테고리 목록 조회")
 async def list_categories(
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=100),
+    limit: int = Query(default=20, ge=1, le=10000),
     service: CategoryService = Depends(get_category_service),
 ):
     items = service.list_categories(skip=skip, limit=limit)
