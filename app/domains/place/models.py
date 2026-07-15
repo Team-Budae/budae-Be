@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import Integer, String, Text, Float
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -20,3 +22,29 @@ class Place(Base):
     first_image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     thumbnail_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     raw_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    def _raw_value(self, key: str) -> str | None:
+        if not self.raw_json:
+            return None
+
+        try:
+            payload = json.loads(self.raw_json)
+        except json.JSONDecodeError:
+            return None
+
+        value = payload.get(key)
+        if value in (None, "", " "):
+            return None
+        return str(value)
+
+    @property
+    def event_start_date(self) -> str | None:
+        return self._raw_value("eventstartdate")
+
+    @property
+    def event_end_date(self) -> str | None:
+        return self._raw_value("eventenddate")
+
+    @property
+    def event_place(self) -> str | None:
+        return self._raw_value("eventplace")
