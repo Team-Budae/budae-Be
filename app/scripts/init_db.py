@@ -32,10 +32,21 @@ def ensure_post_columns() -> None:
                 conn.execute(text(sql))
 
 
+def ensure_comment_columns() -> None:
+    with engine.connect() as conn:
+        result = conn.execute(text("PRAGMA table_info(comments)"))
+        existing_columns = {row[1] for row in result.fetchall()}
+
+        if "created_at" not in existing_columns:
+            conn.execute(text("ALTER TABLE comments ADD COLUMN created_at VARCHAR(50) DEFAULT ''"))
+            conn.execute(text("UPDATE comments SET created_at = datetime('now') WHERE created_at = '' OR created_at IS NULL"))
+
+
 def init_db() -> None:
     # 1. 테이블 생성
     Base.metadata.create_all(bind=engine)
     ensure_post_columns()
+    ensure_comment_columns()
     
     # 2. 세션을 열고 초기 더미/수집 데이터 입력 진행
     db = SessionLocal()

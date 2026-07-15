@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Integer, String, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -12,4 +14,5 @@ class Comment(Base):
     content: Mapped[str | None] = mapped_column(Text, nullable=True)
     author_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     password: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    created_at: Mapped[str | None] = mapped_column(String(50), default=lambda: datetime.now().strftime("%Y-%m-%d %H:%M"))
     is_deleted: Mapped[int] = mapped_column(Integer, default=0)

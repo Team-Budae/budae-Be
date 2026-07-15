@@ -12,6 +12,7 @@ class CommentBase(BaseModel):
 
 class CommentRead(CommentBase):
     id: int
+    created_at: str | None = None
     is_deleted: int = 0
 
 
