@@ -18,6 +18,9 @@ class PlaceBase(BaseModel):
 class PlaceRead(PlaceBase):
     id: int
     content_id: str | None = None
+    event_start_date: str | None = None
+    event_end_date: str | None = None
+    event_place: str | None = None
 
 
 class PlaceCreate(PlaceBase):
