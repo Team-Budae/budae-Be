@@ -19,13 +19,20 @@ def get_place_service(db: Session = Depends(get_db)) -> PlaceService:
 async def list_places(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
-    keyword: str | None = Query(default=None),
+    keyword: str | None = Query(default=None, description="이름 또는 주소 검색어"),
+    content_type_id: str | None = Query(default=None, description="카테고리 ID 필터링"), # 👈 파라미터 추가
     service: PlaceService = Depends(get_place_service),
 ):
-    items = service.search_places(keyword, skip=skip, limit=limit) if keyword else service.list_places(skip=skip, limit=limit)
+    # 서비스 계층에서 필터링된 결과와 전체 개수를 반환받음
+    items, total = service.get_places_list(keyword=keyword, content_type_id=content_type_id, skip=skip, limit=limit)
+    
     return {
         "items": [PlaceRead.model_validate(item) for item in items],
-        "pagination": {"page": (skip // limit) + 1 if limit else 1, "size": limit, "total": len(items)},
+        "pagination": {
+            "page": (skip // limit) + 1 if limit else 1, 
+            "size": limit, 
+            "total": total # 정확한 데이터 개수 반환
+        },
     }
 
 

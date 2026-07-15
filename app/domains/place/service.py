@@ -8,8 +8,8 @@ class PlaceService:
     def __init__(self, repository: PlaceRepository):
         self.repository = repository
 
-    def list_places(self, *, skip: int = 0, limit: int = 20) -> list[Place]:
-        return self.repository.list_all(skip=skip, limit=limit)
+    def get_places_list(self, keyword: str | None = None, content_type_id: int | None = None, *, skip: int = 0, limit: int = 20) -> tuple[list[Place], int]:
+        return self.repository.search(keyword=keyword, content_type_id=content_type_id, skip=skip, limit=limit)
 
     def get_place(self, place_id: int) -> Place:
         place = self.repository.get_by_id(place_id)
@@ -33,5 +33,4 @@ class PlaceService:
         place = self.get_place(place_id)
         self.repository.delete(place)
 
-    def search_places(self, keyword: str | None = None, *, skip: int = 0, limit: int = 20) -> list[Place]:
-        return self.repository.search(keyword, skip=skip, limit=limit)
+    

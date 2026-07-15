@@ -12,8 +12,15 @@ class PostBase(BaseModel):
     password: str | None = None
 
 
-class PostRead(PostBase):
+class PostRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
+    place_id: int | None = None
+    category: str | None = None
+    title: str | None = None
+    content: str | None = None
+    author_name: str | None = None
     is_deleted: int = 0
 
 
