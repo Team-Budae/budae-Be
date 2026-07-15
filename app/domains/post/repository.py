@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.common.repository import BaseRepository
@@ -10,7 +11,7 @@ class PostRepository(BaseRepository[Post]):
         super().__init__(session, Post)
 
     def list_posts(self, *, skip: int = 0, limit: int = 20, sort: str = "latest") -> tuple[list[Post], int]:
-        query = self.session.query(Post).filter(Post.is_deleted == 0)
+        query = self.session.query(Post).filter(self._active_filter())
         total = query.count()
         items = self._order_posts(query, sort).offset(skip).limit(limit).all()
         self._attach_comment_preview(items)
@@ -19,7 +20,7 @@ class PostRepository(BaseRepository[Post]):
     def list_popular_posts(self, *, limit: int = 5) -> list[Post]:
         items = (
             self.session.query(Post)
-            .filter(Post.is_deleted == 0)
+            .filter(self._active_filter())
             .order_by(Post.views.desc(), Post.id.desc())
             .limit(limit)
             .all()
@@ -32,6 +33,9 @@ class PostRepository(BaseRepository[Post]):
             return query.order_by(Post.views.desc(), Post.id.desc())
         return query.order_by(Post.id.desc())
 
+    def _active_filter(self):
+        return or_(Post.is_deleted == 0, Post.is_deleted.is_(None))
+
     def _attach_comment_preview(self, posts: list[Post]) -> None:
         post_ids = [post.id for post in posts]
         if not post_ids:
@@ -39,7 +43,7 @@ class PostRepository(BaseRepository[Post]):
 
         comments = (
             self.session.query(Comment)
-            .filter(Comment.post_id.in_(post_ids), Comment.is_deleted == 0)
+            .filter(Comment.post_id.in_(post_ids), or_(Comment.is_deleted == 0, Comment.is_deleted.is_(None)))
             .order_by(Comment.post_id.asc(), Comment.id.desc())
             .all()
         )

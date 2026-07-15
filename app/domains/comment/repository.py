@@ -1,3 +1,4 @@
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.common.repository import BaseRepository
@@ -9,4 +10,8 @@ class CommentRepository(BaseRepository[Comment]):
         super().__init__(session, Comment)
 
     def list_by_post(self, post_id: int) -> list[Comment]:
-        return self.session.query(Comment).filter(Comment.post_id == post_id, Comment.is_deleted == 0).all()
+        return (
+            self.session.query(Comment)
+            .filter(Comment.post_id == post_id, or_(Comment.is_deleted == 0, Comment.is_deleted.is_(None)))
+            .all()
+        )
