@@ -133,8 +133,7 @@ class ChatService:
             response = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=messages,
-                temperature=0.4,
-                max_tokens=800,
+                max_completion_tokens=800,
             )
             return response.choices[0].message.content.strip()
         except OpenAIError as exc:

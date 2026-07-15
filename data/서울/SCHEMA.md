@@ -61,9 +61,37 @@
 
 ---
 
+## items[] 필드 - 축제공연행사(contentTypeId=15) 전용
+
+`{지역}_축제공연행사.json`의 각 item에는 위 공통 필드 외에 `detailIntro2` API로 조회한 아래 일정 필드가 병합되어 있음.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `eventstartdate` | string \| null | 행사 시작일 (YYYYMMDD) |
+| `eventenddate` | string \| null | 행사 종료일 (YYYYMMDD) |
+| `eventplace` | string \| null | 행사 장소 |
+| `playtime` | string \| null | 공연 시간 |
+| `program` | string \| null | 행사 프로그램 |
+| `subevent` | string \| null | 부대 행사 |
+| `sponsor1` | string \| null | 주최자 정보 |
+| `sponsor1tel` | string \| null | 주최자 연락처 |
+| `sponsor2` | string \| null | 주관사 정보 |
+| `sponsor2tel` | string \| null | 주관사 연락처 |
+| `eventhomepage` | string \| null | 행사 홈페이지 |
+| `bookingplace` | string \| null | 예매처 |
+| `agelimit` | string \| null | 관람 가능 연령 |
+| `festivalgrade` | string \| null | 축제 등급 |
+| `placeinfo` | string \| null | 행사장 위치 안내 |
+| `spendtimefestival` | string \| null | 관람 소요 시간 |
+| `discountinfofestival` | string \| null | 할인 정보 |
+| `usetimefestival` | string \| null | 이용 요금 |
+
+---
+
 ## 주의 사항
 
 - `mapx` / `mapy` 는 string 타입으로 저장됨. 사용 시 float 변환 필요.
 - `firstimage` 가 빈 문자열(`""`)인 경우 이미지 없음을 의미.
 - `addr1` 이 빈 문자열인 경우 주소 정보 미제공.
 - `cat1~3`, `lclsSystm1~3` 코드 정의는 상위 디렉토리의 `lclsSystemCode.json` 참조.
+- 축제공연행사 일정 필드는 `detailIntro2` 상세조회 응답이 없었던 항목의 경우 17개 필드 전체가 `null`임 (빈 문자열 `""`과 달리, API 자체가 정보 없음을 응답한 것이 아니라 상세조회가 실패/누락된 경우).

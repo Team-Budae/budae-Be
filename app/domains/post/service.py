@@ -8,8 +8,8 @@ class PostService:
     def __init__(self, repository: PostRepository):
         self.repository = repository
 
-    def list_posts(self, *, skip: int = 0, limit: int = 20) -> list[Post]:
-        return self.repository.list_all(skip=skip, limit=limit)
+    def list_posts(self, *, skip: int = 0, limit: int = 20) -> tuple[list[Post], int]:
+        return self.repository.list_posts(skip=skip, limit=limit)
 
     def get_post(self, post_id: int) -> Post:
         post = self.repository.get_by_id(post_id)
@@ -37,3 +37,8 @@ class PostService:
             raise ForbiddenError("비밀번호가 일치하지 않습니다.")
         post.is_deleted = 1
         self.repository.session.commit()
+
+    def verify_password(self, post_id: int, password: str) -> None:
+        post = self.get_post(post_id)
+        if post.password != password:
+            raise ForbiddenError("비밀번호가 일치하지 않습니다.")

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.common.schemas import BaseResponse, PaginatedResponse
 from app.core.database import get_db
 from app.domains.post.repository import PostRepository
-from app.domains.post.schemas import PostCreate, PostRead, PostUpdate
+from app.domains.post.schemas import PostCreate, PostRead, PostUpdate, PasswordVerify
 from app.domains.post.service import PostService
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -21,10 +21,10 @@ async def list_posts(
     limit: int = Query(default=20, ge=1, le=100),
     service: PostService = Depends(get_post_service),
 ):
-    items = service.list_posts(skip=skip, limit=limit)
+    items, total = service.list_posts(skip=skip, limit=limit)
     return {
         "items": [PostRead.model_validate(item) for item in items],
-        "pagination": {"page": (skip // limit) + 1 if limit else 1, "size": limit, "total": len(items)},
+        "pagination": {"page": (skip // limit) + 1 if limit else 1, "size": limit, "total": total},
     }
 
 
@@ -49,3 +49,9 @@ async def update_post(post_id: int, payload: PostUpdate, service: PostService = 
 async def delete_post(post_id: int, password: str, service: PostService = Depends(get_post_service)):
     service.delete_post(post_id, password)
     return BaseResponse(message="게시글이 삭제되었습니다.")
+
+
+@router.post("/{post_id}/verify", response_model=BaseResponse, summary="게시글 비밀번호 검증")
+async def verify_post_password(post_id: int, payload: PasswordVerify, service: PostService = Depends(get_post_service)):
+    service.verify_password(post_id, payload.password)
+    return BaseResponse(message="비밀번호가 올바릅니다.")

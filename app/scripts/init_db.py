@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from sqlalchemy import text
+
 from app.core.database import Base, engine, SessionLocal
 from app.domains.category.models import Category
 from app.domains.chat.models import ChatMessage, ChatSession
@@ -12,9 +14,28 @@ from app.scripts.import_seoul_data import import_seoul_data
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "서울"
 
+
+def ensure_post_columns() -> None:
+    with engine.connect() as conn:
+        result = conn.execute(text("PRAGMA table_info(posts)"))
+        existing_columns = {row[1] for row in result.fetchall()}
+
+        migrations = [
+            ("views", "ALTER TABLE posts ADD COLUMN views INTEGER DEFAULT 0"),
+            ("likes", "ALTER TABLE posts ADD COLUMN likes INTEGER DEFAULT 0"),
+            ("comments", "ALTER TABLE posts ADD COLUMN comments INTEGER DEFAULT 0"),
+            ("date", "ALTER TABLE posts ADD COLUMN date VARCHAR(20) DEFAULT (date('now'))"),
+        ]
+
+        for column_name, sql in migrations:
+            if column_name not in existing_columns:
+                conn.execute(text(sql))
+
+
 def init_db() -> None:
     # 1. 테이블 생성
     Base.metadata.create_all(bind=engine)
+    ensure_post_columns()
     
     # 2. 세션을 열고 초기 더미/수집 데이터 입력 진행
     db = SessionLocal()
