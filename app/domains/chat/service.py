@@ -2,6 +2,7 @@ import json
 
 from openai import OpenAI, OpenAIError
 
+
 from app.common.exceptions import ValidationError
 from app.domains.chat.repository import ChatRepository
 from app.domains.chat.schemas import ChatRequest, ChatResponse
@@ -137,7 +138,8 @@ class ChatService:
             response = client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=messages,
-                max_completion_tokens=800,
+                max_completion_tokens=2000,
+                reasoning_effort="low",
             )
 
             print("===== OpenAI Response =====")
@@ -147,11 +149,16 @@ class ChatService:
 
             if not content:
                 print("OpenAI returned empty content")
-                return ""
+                # 빈 응답인 경우에만 기본 에러를 발생시킵니다.
+                raise RuntimeError("OpenAI 응답이 비어 있습니다.")
 
             return content.strip()
 
+        except OpenAIError as e:
+            # API 키 오류, 크레딧 부족(429), 모델명 오류 등 OpenAI 관련 명확한 에러를 그대로 위로 던져서 디버깅을 돕습니다.
+            print(f"OpenAI API Error: {str(e)}")
+            raise RuntimeError(f"OpenAI 서비스 에러: {str(e)}") from e
         except Exception as e:
             import traceback
             traceback.print_exc()
-            return ""
+            raise RuntimeError(f"예기치 못한 에러가 발생했습니다: {str(e)}") from e
